@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nife Bakes — Handmade Bakes from Kent</title>
+<meta name="description" content="Nife Bakes — Cakes, cupcakes, brownies & cinnamon rolls handmade in Kent. Collection only." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF4E0;
+    --peach: #FFB8A1;
+    --pink:  #FF6FA1;
+    --berry: #E0316B;
+    --choc:  #4A2618;
+    --butter:#FFD46B;
+    --mint:  #9DE3C5;
+    --ink:   #2A1810;
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor-dot, .cursor-ring{
+    position: fixed; top:0; left:0; pointer-events:none; z-index: 9999;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    transition: transform .15s ease, width .25s ease, height .25s ease, background .25s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-dot{ width:10px; height:10px; background: var(--berry); }
+  .cursor-ring{ width:42px; height:42px; border:2px solid var(--berry); }
+  .cursor-ring.hover{ width:80px; height:80px; background: var(--butter); border-color: var(--butter); }
+
+  /* Floating sprinkles bg */
+  .sprinkles{
+    position: fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .sprinkle{
+    position:absolute; width:14px; height:6px; border-radius: 6px;
+    opacity: .55; animation: drift linear infinite;
+  }
+  @keyframes drift{
+    0%   { transform: translateY(-10vh) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  /* NAV */
+  nav{
+    position: fixed; top:0; left:0; right:0; z-index: 100;
+    display:flex; justify-content: space-between; align-items: center;
+    padding: 22px 40px;
+    background: rgba(255,244,224,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px dashed rgba(74,38,24,0.15);
+  }
+  .logo{
+    font-family: 'Fraunces', serif; font-weight: 900; font-size: 28px;
+    color: var(--berry); letter-spacing: -1px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo span{ font-family:'Caveat', cursive; color: var(--choc); font-size: 32px; transform: rotate(-6deg); display:inline-block; }
+  .nav-links{ display:flex; gap: 32px; list-style: none; }
+  .nav-links a{
+    color: var(--choc); text-decoration: none; font-weight: 500; font-size: 15px;
+    position: relative; padding: 4px 0; transition: color .25s;
+  }
+  .nav-links a::after{
+    content:''; position:absolute; bottom:-2px; left:0; width:0; height:3px;
+    background: var(--pink); border-radius: 2px; transition: width .35s cubic-bezier(.7,0,.3,1);
+  }
+  .nav-links a:hover{ color: var(--berry); }
+  .nav-links a:hover::after{ width: 100%; }
+  .nav-cta{
+    background: var(--berry); color: var(--cream); padding: 10px 22px; border-radius: 999px;
+    text-decoration:none; font-weight:700; font-size:14px;
+    box-shadow: 4px 4px 0 var(--choc); transition: transform .2s, box-shadow .2s;
+  }
+  .nav-cta:hover{ transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--choc); }
+
+  /* HERO */
+  .hero{
+    min-height: 100vh; position: relative; padding: 140px 40px 80px;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,184,161,.6), transparent 40%),
+      radial-gradient(circle at 85% 30%, rgba(255,212,107,.55), transparent 40%),
+      radial-gradient(circle at 50% 90%, rgba(255,111,161,.4), transparent 50%);
+  }
+  .hero-content{
+    position: relative; z-index: 2; text-align:center; max-width: 1100px;
+  }
+  .eyebrow{
+    font-family:'Caveat', cursive; font-size: 32px; color: var(--berry);
+    transform: rotate(-3deg); display:inline-block; margin-bottom: 8px;
+    opacity:0; animation: fadeUp .8s .2s forwards;
+  }
+  h1.hero-title{
+    font-family:'Fraunces', serif; font-weight: 900;
+    font-size: clamp(56px, 11vw, 180px); line-height: .9;
+    color: var(--choc); letter-spacing: -3px;
+  }
+  h1.hero-title .word{
+    display:inline-block; opacity:0; transform: translateY(40px);
+    animation: heroIn .9s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  h1.hero-title .word:nth-child(1){ animation-delay:.3s; }
+  h1.hero-title .word:nth-child(2){ animation-delay:.5s; color: var(--berry); font-style: italic; }
+  h1.hero-title .word:nth-child(3){ animation-delay:.7s; }
+  @keyframes heroIn{ to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+
+  .hero-sub{
+    font-size: clamp(16px, 1.6vw, 20px); margin: 24px auto 36px;
+    max-width: 540px; color: var(--choc); line-height: 1.6;
+    opacity:0; animation: fadeUp .8s 1s forwards;
+  }
+  .hero-ctas{
+    display:flex; gap: 20px; justify-content:center; flex-wrap:wrap;
+    opacity:0; animation: fadeUp .8s 1.2s forwards;
+  }
+  .btn{
+    padding: 18px 36px; border-radius: 999px; font-weight: 700; font-size: 16px;
+    text-decoration: none; transition: all .3s cubic-bezier(.7,0,.3,1);
+    display:inline-flex; align-items:center; gap:10px; border: 2px solid var(--choc);
+  }
+  .btn-primary{
+    background: var(--pink); color: var(--cream);
+    box-shadow: 6px 6px 0 var(--choc);
+  }
+  .btn-primary:hover{ transform: translate(-3px,-3px); box-shadow: 9px 9px 0 var(--choc); background: var(--berry); }
+  .btn-secondary{
+    background: var(--cream); color: var(--choc);
+    box-shadow: 6px 6px 0 var(--choc);
+  }
+  .btn-secondary:hover{ transform: translate(-3px,-3px); box-shadow: 9px 9px 0 var(--choc); background: var(--butter); }
+
+  /* Floating hero illustrations (CSS-drawn) */
+  .float{
+    position:absolute; z-index: 1;
+    animation: bob 6s ease-in-out infinite;
+  }
+  .float.f1{ top: 18%; left: 8%; animation-delay: 0s; }
+  .float.f2{ top: 25%; right: 10%; animation-delay: 1.5s; }
+  .float.f3{ bottom: 18%; left: 14%; animation-delay: 3s; }
+  .float.f4{ bottom: 22%; right: 8%; animation-delay: 4.5s; }
+  @keyframes bob{
+    0%,100%{ transform: translateY(0) rotate(-5deg); }
+    50%    { transform: translateY(-22px) rotate(5deg); }
+  }
+
+  .scroll-hint{
+    position:absolute; bottom: 30px; left:50%; transform: translateX(-50%);
+    font-family:'Caveat',cursive; font-size: 22px; color: var(--choc);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    animation: bounce 2s ease-in-out infinite;
+    opacity:0; animation: fadeUp .8s 1.6s forwards, bounce 2s 2.4s ease-in-out infinite;
+  }
+  @keyframes bounce{ 0%,100%{transform: translate(-50%, 0);} 50%{ transform: translate(-50%, 10px);} }
+
+  /* SECTIONS */
+  section{ position: relative; z-index: 2; padding: 120px 40px; }
+  .container{ max-width: 1300px; margin: 0 auto; }
+  .section-tag{
+    font-family:'Caveat', cursive; font-size: 36px; color: var(--berry);
+    transform: rotate(-3deg); display:inline-block; margin-bottom: 8px;
+  }
+  h2{
+    font-family:'Fraunces', serif; font-weight: 900;
+    font-size: clamp(40px, 6vw, 88px); line-height: 1; color: var(--choc);
+    letter-spacing: -2px; margin-bottom: 24px;
+  }
+  h2 em{ color: var(--berry); font-style: italic; }
+
+  /* MENU */
+  .menu-section{
+    background: var(--choc); color: var(--cream);
+    border-radius: 60px 60px 0 0; margin-top: -40px;
+  }
+  .menu-section h2{ color: var(--cream); }
+  .menu-section h2 em{ color: var(--butter); }
+  .menu-section .section-tag{ color: var(--peach); }
+  .menu-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px; margin-top: 60px;
+  }
+  .menu-card{
+    background: var(--cream); color: var(--ink);
+    border-radius: 30px; padding: 40px 30px; text-align:center;
+    position: relative; overflow: hidden;
+    transition: transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s;
+    border: 3px solid var(--ink);
+    cursor: none;
+  }
+  .menu-card:hover{
+    transform: translateY(-12px) rotate(-2deg);
+    box-shadow: 12px 12px 0 var(--berry);
+  }
+  .menu-card:nth-child(2):hover{ transform: translateY(-12px) rotate(2deg); box-shadow: -12px 12px 0 var(--pink); }
+  .menu-card:nth-child(3):hover{ transform: translateY(-12px) rotate(-1deg); box-shadow: 12px 12px 0 var(--butter); }
+  .menu-card:nth-child(4):hover{ transform: translateY(-12px) rotate(2deg); box-shadow: -12px 12px 0 var(--mint); }
+
+  .menu-card .icon{
+    width: 110px; height: 110px; margin: 0 auto 20px;
+    transition: transform .5s cubic-bezier(.5,1.5,.5,1);
+  }
+  .menu-card:hover .icon{ transform: scale(1.15) rotate(-8deg); }
+  .menu-card h3{
+    font-family:'Fraunces', serif; font-size: 28px; margin-bottom: 10px;
+    color: var(--berry);
+  }
+  .menu-card p{ font-size: 15px; line-height: 1.6; color: var(--choc); }
+  .menu-card .price-hint{
+    font-family:'Caveat', cursive; font-size: 22px; color: var(--berry);
+    margin-top: 14px; display:block;
+  }
+
+  /* STORY */
+  .story-section{ background: var(--peach); }
+  .story-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .story-text p{ font-size: 18px; line-height: 1.8; margin-bottom: 20px; color: var(--choc); }
+  .story-visual{
+    aspect-ratio: 1; background: var(--cream);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    border: 4px solid var(--choc);
+    display:flex; align-items:center; justify-content:center;
+    position: relative; overflow: hidden;
+    animation: morph 12s ease-in-out infinite;
+  }
+  @keyframes morph{
+    0%,100% { border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+    33%     { border-radius: 60% 40% 50% 50% / 40% 60% 50% 50%; }
+    66%     { border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%; }
+  }
+  .story-visual svg{ width: 70%; height: 70%; }
+
+  .story-stats{
+    display:flex; gap: 30px; margin-top: 30px; flex-wrap:wrap;
+  }
+  .stat{
+    background: var(--cream); padding: 18px 24px; border-radius: 16px;
+    border: 2px solid var(--choc); box-shadow: 4px 4px 0 var(--choc);
+  }
+  .stat strong{ font-family:'Fraunces', serif; font-size: 32px; color: var(--berry); display:block; }
+  .stat span{ font-size: 13px; color: var(--choc); font-weight: 500; }
+
+  /* COLLECTION (highlighted notice) */
+  .collection-section{ background: var(--butter); text-align:center; }
+  .collection-banner{
+    display: inline-block;
+    background: var(--cream); padding: 50px 60px; border-radius: 30px;
+    border: 4px solid var(--choc); box-shadow: 12px 12px 0 var(--berry);
+    transform: rotate(-1deg);
+    transition: transform .3s;
+  }
+  .collection-banner:hover{ transform: rotate(1deg) scale(1.02); }
+  .collection-banner h2{ font-size: clamp(36px, 5vw, 64px); }
+  .collection-banner p{ font-size: 18px; max-width: 480px; margin: 16px auto 0; line-height:1.6; }
+  .pin-badge{
+    display:inline-flex; align-items:center; gap:10px;
+    background: var(--berry); color: var(--cream); padding: 10px 22px;
+    border-radius: 999px; font-weight:700; margin-top: 24px; font-size: 15px;
+  }
+
+  /* MARQUEE */
+  .marquee{
+    overflow: hidden; padding: 30px 0; background: var(--berry); color: var(--cream);
+    border-top: 4px solid var(--choc); border-bottom: 4px solid var(--choc);
+  }
+  .marquee-track{
+    display:flex; gap: 60px; animation: scroll 30s linear infinite;
+    white-space: nowrap; font-family: 'Fraunces', serif; font-size: 48px;
+    font-weight: 900; font-style: italic;
+  }
+  .marquee-track span{ display:flex; align-items:center; gap: 60px; }
+  .marquee-track .dot{ width:14px; height:14px; background: var(--butter); border-radius:50%; display:inline-block; }
+  @keyframes scroll{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-50%); }
+  }
+
+  /* ORDER */
+  .order-section{ background: var(--mint); }
+  .order-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px; margin-top: 60px;
+  }
+  .step{
+    background: var(--cream); padding: 36px 28px; border-radius: 24px;
+    border: 3px solid var(--choc); position: relative;
+    transition: transform .3s;
+  }
+  .step:hover{ transform: translateY(-6px); }
+  .step-num{
+    position:absolute; top:-22px; left: 24px;
+    background: var(--berry); color: var(--cream);
+    width: 50px; height: 50px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-size: 24px; font-weight: 900;
+    border: 3px solid var(--choc);
+  }
+  .step h4{ font-family:'Fraunces', serif; font-size: 22px; margin: 12px 0 10px; color: var(--berry); }
+  .step p{ font-size: 15px; line-height: 1.6; color: var(--choc); }
+
+  /* CONTACT */
+  .contact-section{ background: var(--pink); color: var(--cream); text-align:center; padding: 140px 40px; }
+  .contact-section h2{ color: var(--cream); }
+  .contact-section h2 em{ color: var(--butter); }
+  .contact-section .section-tag{ color: var(--cream); }
+  .contact-options{
+    display:flex; gap: 30px; justify-content:center; flex-wrap:wrap; margin-top: 50px;
+  }
+  .contact-card{
+    background: var(--cream); color: var(--ink); padding: 36px 40px;
+    border-radius: 24px; border: 3px solid var(--choc);
+    box-shadow: 8px 8px 0 var(--choc);
+    transition: transform .3s, box-shadow .3s;
+    min-width: 240px; cursor: none;
+  }
+  .contact-card:hover{ transform: translate(-4px,-4px); box-shadow: 12px 12px 0 var(--choc); }
+  .contact-card .icon{ font-size: 40px; margin-bottom: 12px; }
+  .contact-card h4{ font-family:'Fraunces', serif; font-size: 22px; color: var(--berry); margin-bottom: 6px; }
+  .contact-card p{ font-size: 15px; }
+
+  /* FOOTER */
+  footer{
+    background: var(--choc); color: var(--cream); padding: 60px 40px 30px; text-align:center;
+  }
+  footer .logo{ justify-content:center; margin-bottom: 16px; color: var(--peach); }
+  footer .logo span{ color: var(--butter); }
+  footer p{ font-size: 14px; opacity: .85; line-height:1.7; }
+  footer .small{ margin-top: 24px; font-size: 12px; opacity: .6; }
+
+  /* Reveal on scroll */
+  .reveal{ opacity:0; transform: translateY(40px); transition: opacity .8s, transform .8s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in{ opacity:1; transform: translateY(0); }
+
+  /* Responsive */
+  @media (max-width: 900px){
+    body{ cursor: auto; }
+    .cursor-dot, .cursor-ring{ display:none; }
+    nav{ padding: 16px 20px; }
+    .nav-links{ display:none; }
+    .hero{ padding: 120px 20px 60px; }
+    section{ padding: 80px 20px; }
+    .story-grid{ grid-template-columns: 1fr; gap: 40px; }
+    .float{ display:none; }
+    .menu-card, .contact-card{ cursor: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Floating sprinkles background -->
+<div class="sprinkles" id="sprinkles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">nife <span>bakes</span></div>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#order">How to Order</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta" data-hover>Order Now</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Floating illustrations -->
+  <div class="float f1">
+    <svg width="90" height="90" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="70" rx="35" ry="12" fill="#4A2618"/>
+      <rect x="20" y="40" width="60" height="35" rx="6" fill="#FF6FA1"/>
+      <path d="M20 45 Q35 30 50 45 T80 45" fill="#FFF4E0"/>
+      <circle cx="35" cy="38" r="3" fill="#E0316B"/>
+      <circle cx="50" cy="35" r="3" fill="#FFD46B"/>
+      <circle cx="65" cy="38" r="3" fill="#9DE3C5"/>
+    </svg>
+  </div>
+  <div class="float f2">
+    <svg width="80" height="80" viewBox="0 0 100 100">
+      <path d="M30 80 Q30 50 50 50 Q70 50 70 80 Z" fill="#FFD46B"/>
+      <path d="M30 55 Q50 35 70 55 Q60 60 50 58 Q40 60 30 55 Z" fill="#FFF4E0"/>
+      <circle cx="50" cy="40" r="6" fill="#E0316B"/>
+    </svg>
+  </div>
+  <div class="float f3">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <rect x="20" y="35" width="60" height="45" rx="4" fill="#4A2618"/>
+      <rect x="20" y="35" width="60" height="10" fill="#6B3422"/>
+      <circle cx="32" cy="55" r="3" fill="#FFD46B"/>
+      <circle cx="48" cy="62" r="3" fill="#FFD46B"/>
+      <circle cx="64" cy="55" r="3" fill="#FFD46B"/>
+      <circle cx="40" cy="70" r="3" fill="#FFD46B"/>
+      <circle cx="60" cy="70" r="3" fill="#FFD46B"/>
+    </svg>
+  </div>
+  <div class="float f4">
+    <svg width="90" height="90" viewBox="0 0 100 100">
+      <path d="M20 60 Q20 30 50 30 Q80 30 80 60 Q80 80 50 80 Q20 80 20 60 Z" fill="#FFB8A1"/>
+      <path d="M30 55 Q40 50 50 55 Q60 50 70 55 Q60 60 50 60 Q40 60 30 55 Z" fill="#FF6FA1"/>
+      <path d="M28 65 Q40 60 52 65 Q63 60 72 65" stroke="#E0316B" stroke-width="2" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <span class="eyebrow">handmade in kent · since day one</span>
+    <h1 class="hero-title">
+      <span class="word">Bakes</span>
+      <span class="word">that</span>
+      <span class="word">spark joy.</span>
+    </h1>
+    <p class="hero-sub">
+      Cakes, cupcakes, brownies and the cinnamon rolls people drive across town for.
+      Made fresh, made small, made by hand.
+    </p>
+    <div class="hero-ctas">
+      <a href="#menu" class="btn btn-primary" data-hover>See the menu →</a>
+      <a href="#order" class="btn btn-secondary" data-hover>How to order</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>scroll for goodies</span>
+    <svg width="20" height="30" viewBox="0 0 20 30"><path d="M10 0 V25 M2 17 L10 25 L18 17" stroke="#4A2618" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+  </div>
+</header>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <span class="section-tag">what we bake</span>
+      <h2>Four things.<br><em>Done properly.</em></h2>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card reveal" data-hover>
+        <svg class="icon" viewBox="0 0 100 100">
+          <ellipse cx="50" cy="80" rx="38" ry="8" fill="#4A2618"/>
+          <rect x="15" y="40" width="70" height="40" rx="4" fill="#FFB8A1"/>
+          <path d="M15 45 Q30 30 50 42 Q70 30 85 45 L85 50 Q70 38 50 50 Q30 38 15 50 Z" fill="#FF6FA1"/>
+          <rect x="48" y="20" width="4" height="22" fill="#FFD46B"/>
+          <path d="M50 12 Q44 18 50 22 Q56 18 50 12" fill="#E0316B"/>
+          <circle cx="30" cy="60" r="2" fill="#FFD46B"/>
+          <circle cx="70" cy="62" r="2" fill="#9DE3C5"/>
+          <circle cx="50" cy="68" r="2" fill="#E0316B"/>
+        </svg>
+        <h3>Celebration Cakes</h3>
+        <p>Birthdays, weddings, "it's tuesday" — every cake gets the same loving treatment.</p>
+        <span class="price-hint">made to order</span>
+      </div>
+
+      <div class="menu-card reveal" data-hover>
+        <svg class="icon" viewBox="0 0 100 100">
+          <path d="M25 60 L75 60 L70 90 L30 90 Z" fill="#4A2618"/>
+          <path d="M25 60 L75 60 L72 65 L28 65 Z" fill="#6B3422"/>
+          <path d="M30 55 Q35 30 50 30 Q65 30 70 55 Q60 50 50 52 Q40 50 30 55 Z" fill="#FF6FA1"/>
+          <path d="M30 55 Q40 60 50 58 Q60 60 70 55" fill="#FFB8A1"/>
+          <circle cx="50" cy="32" r="4" fill="#E0316B"/>
+          <circle cx="40" cy="42" r="2" fill="#FFD46B"/>
+          <circle cx="60" cy="44" r="2" fill="#9DE3C5"/>
+        </svg>
+        <h3>Cupcakes</h3>
+        <p>Buttercream swirls. Flavours that change with the season. Sold by the box.</p>
+        <span class="price-hint">by the half-dozen</span>
+      </div>
+
+      <div class="menu-card reveal" data-hover>
+        <svg class="icon" viewBox="0 0 100 100">
+          <rect x="18" y="35" width="64" height="48" rx="4" fill="#3A1810"/>
+          <rect x="18" y="35" width="64" height="12" fill="#5A2818"/>
+          <circle cx="32" cy="55" r="2.5" fill="#FFD46B"/>
+          <circle cx="50" cy="62" r="2.5" fill="#FFD46B"/>
+          <circle cx="68" cy="58" r="2.5" fill="#FFD46B"/>
+          <circle cx="40" cy="72" r="2.5" fill="#FFD46B"/>
+          <circle cx="62" cy="74" r="2.5" fill="#FFD46B"/>
+          <path d="M22 32 L78 32 L82 38 L18 38 Z" fill="#6B3422"/>
+        </svg>
+        <h3>Brownies</h3>
+        <p>Fudgy, rich, properly chocolatey. Cut thick. Eaten warm if you've got any sense.</p>
+        <span class="price-hint">from £8 a box</span>
+      </div>
+
+      <div class="menu-card reveal" data-hover>
+        <svg class="icon" viewBox="0 0 100 100">
+          <circle cx="50" cy="55" r="32" fill="#FFB8A1"/>
+          <path d="M50 55 m-25 0 a25 25 0 0 1 50 0 a25 25 0 0 1 -50 0" fill="none" stroke="#6B3422" stroke-width="3"/>
+          <path d="M50 55 m-18 0 a18 18 0 0 1 36 0 a18 18 0 0 1 -36 0" fill="none" stroke="#6B3422" stroke-width="3"/>
+          <path d="M50 55 m-10 0 a10 10 0 0 1 20 0 a10 10 0 0 1 -20 0" fill="none" stroke="#6B3422" stroke-width="3"/>
+          <path d="M30 35 Q35 25 50 28 Q65 25 70 35 Q60 38 50 36 Q40 38 30 35" fill="#FFF4E0"/>
+        </svg>
+        <h3>Cinnamon Rolls</h3>
+        <p>Soft, swirly, drowned in cream cheese glaze. The reason regulars are regulars.</p>
+        <span class="price-hint">£3.50 each</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>FRESH BAKES <span class="dot"></span> SMALL BATCH <span class="dot"></span> KENT MADE <span class="dot"></span> COLLECTION ONLY <span class="dot"></span> ORDER AHEAD <span class="dot"></span></span>
+    <span>FRESH BAKES <span class="dot"></span> SMALL BATCH <span class="dot"></span> KENT MADE <span class="dot"></span> COLLECTION ONLY <span class="dot"></span> ORDER AHEAD <span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- STORY -->
+<section class="story-section" id="story">
+  <div class="container">
+    <div class="story-grid">
+      <div class="story-text reveal">
+        <span class="section-tag">our story</span>
+        <h2>A small kitchen.<br><em>Big appetites.</em></h2>
+        <p>
+          Nife Bakes is a one-oven, two-hand operation in the heart of Kent. We started
+          baking for friends and family, then friends-of-friends — and somewhere along
+          the way it became a proper little business.
+        </p>
+        <p>
+          Everything is mixed, baked and decorated by hand the day before collection.
+          No pre-mixes, no shortcuts, no big trays of yesterday's stock.
+        </p>
+        <div class="story-stats">
+          <div class="stat"><strong>100%</strong><span>Handmade in Kent</span></div>
+          <div class="stat"><strong>0</strong><span>Pre-mixes used</span></div>
+          <div class="stat"><strong>4</strong><span>Things we love making</span></div>
+        </div>
+      </div>
+      <div class="story-visual reveal">
+        <svg viewBox="0 0 200 200">
+          <!-- Whisk -->
+          <line x1="100" y1="40" x2="100" y2="100" stroke="#4A2618" stroke-width="6" stroke-linecap="round"/>
+          <ellipse cx="100" cy="130" rx="30" ry="40" fill="none" stroke="#4A2618" stroke-width="4"/>
+          <ellipse cx="100" cy="130" rx="20" ry="40" fill="none" stroke="#4A2618" stroke-width="3"/>
+          <ellipse cx="100" cy="130" rx="10" ry="40" fill="none" stroke="#4A2618" stroke-width="3"/>
+          <!-- Hearts -->
+          <path d="M50 50 Q45 45 50 40 Q55 45 50 50" fill="#E0316B"/>
+          <path d="M150 60 Q145 55 150 50 Q155 55 150 60" fill="#E0316B"/>
+          <path d="M40 150 Q35 145 40 140 Q45 145 40 150" fill="#E0316B"/>
+          <path d="M160 140 Q155 135 160 130 Q165 135 160 140" fill="#E0316B"/>
+          <!-- Sparkles -->
+          <circle cx="60" cy="100" r="3" fill="#FFD46B"/>
+          <circle cx="140" cy="100" r="3" fill="#FFD46B"/>
+          <circle cx="100" cy="170" r="3" fill="#9DE3C5"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION NOTICE -->
+<section class="collection-section">
+  <div class="container reveal">
+    <div class="collection-banner">
+      <span class="section-tag">important bit</span>
+      <h2><em>Collection only.</em><br>From Kent.</h2>
+      <p>
+        We're a tiny operation, so we don't deliver — but pickup is easy and we'll have
+        your box boxed, ribboned and ready when you arrive.
+      </p>
+      <div class="pin-badge">
+        <svg width="16" height="20" viewBox="0 0 16 20"><path d="M8 0 C3.6 0 0 3.6 0 8 C0 14 8 20 8 20 S16 14 16 8 C16 3.6 12.4 0 8 0 Z M8 11 C6.3 11 5 9.7 5 8 S6.3 5 8 5 9.7 6.3 9.7 8 9.7 11 8 11 Z" fill="#FFF4E0"/></svg>
+        Based in Kent · Address shared at order
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO ORDER -->
+<section class="order-section" id="order">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <span class="section-tag">easy as cake</span>
+      <h2>How to <em>order</em></h2>
+    </div>
+
+    <div class="order-grid">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h4>Get in touch</h4>
+        <p>Email or DM us with what you'd like, how many, and when you'd like it for.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h4>We confirm</h4>
+        <p>We'll come back with a price, a pickup slot and the collection address.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h4>We bake</h4>
+        <p>The day before pickup, your bakes are made fresh, decorated and boxed up.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <h4>You collect</h4>
+        <p>Pop by your slot, grab the box, and get to the eating part.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="container reveal">
+    <span class="section-tag">say hello</span>
+    <h2>Let's bake<br>something <em>good.</em></h2>
+    <p style="max-width:480px; margin: 24px auto 0; font-size: 17px; line-height: 1.6;">
+      Tell us what you fancy. We reply within 24 hours, usually with a smile and possibly with crumbs on the keyboard.
+    </p>
+
+    <div class="contact-options">
+      <a href="mailto:hello@nifebakes.co.uk" class="contact-card" data-hover style="text-decoration:none;">
+        <div class="icon">✉️</div>
+        <h4>Email</h4>
+        <p>hello@nifebakes.co.uk</p>
+      </a>
+      <a href="https://instagram.com" class="contact-card" data-hover style="text-decoration:none;">
+        <div class="icon">📸</div>
+        <h4>Instagram</h4>
+        <p>@nifebakes</p>
+      </a>
+      <div class="contact-card" data-hover>
+        <div class="icon">📍</div>
+        <h4>Where</h4>
+        <p>Kent, UK · Collection only</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">nife <span>bakes</span></div>
+  <p>Handmade cakes, cupcakes, brownies & cinnamon rolls.<br>Baked with care in Kent.</p>
+  <p class="small">© <span id="year"></span> Nife Bakes · Made with butter, sugar and a lot of patience.</p>
+</footer>
+
+<script>
+  // ---- Custom cursor ----
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0, rx=0,ry=0;
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx+'px'; dot.style.top = my+'px';
+  });
+  function loop(){
+    rx += (mx-rx)*0.18; ry += (my-ry)*0.18;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(loop);
+  }
+  loop();
+  document.querySelectorAll('[data-hover], a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+
+  // ---- Sprinkles background ----
+  const colors = ['#FF6FA1','#FFD46B','#9DE3C5','#FFB8A1','#E0316B'];
+  const sprinklesEl = document.getElementById('sprinkles');
+  for (let i=0; i<28; i++){
+    const s = document.createElement('div');
+    s.className = 'sprinkle';
+    s.style.left = Math.random()*100 + '%';
+    s.style.background = colors[Math.floor(Math.random()*colors.length)];
+    s.style.animationDuration = (8 + Math.random()*12) + 's';
+    s.style.animationDelay = (-Math.random()*15) + 's';
+    s.style.transform = `rotate(${Math.random()*360}deg)`;
+    sprinklesEl.appendChild(s);
+  }
+
+  // ---- Reveal on scroll ----
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Stagger menu cards
+  document.querySelectorAll('.menu-grid .reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.1) + 's';
+  });
+  document.querySelectorAll('.order-grid .reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.1) + 's';
+  });
+
+  // ---- Year ----
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---- Parallax floats on mouse ----
+  const floats = document.querySelectorAll('.float');
+  document.querySelector('.hero').addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 30;
+    const y = (e.clientY / window.innerHeight - 0.5) * 30;
+    floats.forEach((f, i) => {
+      const depth = (i+1) * 0.4;
+      f.style.transform = `translate(${x*depth}px, ${y*depth}px)`;
+    });
+  });
+</script>
+</body>
+</html>
